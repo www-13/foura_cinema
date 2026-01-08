@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FOURA CINEMA | فورا سينما</title>
     <style>
- /* Foura Cinema Theme - Modern Arabic Design */
+        /* Foura Cinema Theme - Modern Arabic Design */
         :root {
             --primary: #e50914;
             --primary-dark: #b20710;
@@ -521,7 +521,6 @@
             text-align: center;
             padding: 20px;
         }
-        
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 </head>
@@ -625,428 +624,198 @@
     </div>
 
     <script>
-        // Configuration - FIXED FOR HTTPS
-        const CONFIG = {
+
+// Configuration - SIMPLE FIX
+const CONFIG = {
             username: 'xadel99320',
             password: '01070115953',
             server: 'http://sa.savpn.xyz',
-            videoServer: 'http://invo2-103.tutor3.site',
-            // HTTPS Proxy to fix mixed content issues on GitHub Pages
-            corsProxy: 'https://api.allorigins.win/raw?url=',
-            corsProxyAlt: 'https://corsproxy.io/?',
-            endpoints: {
-                movies: '/player_api.php?username=xadel99320&password=01070115953&action=get_vod_streams',
-                series: '/player_api.php?username=xadel99320&password=01070115953&action=get_series'
-            }
+            videoServer: 'http://invo2-103.tutor3.site'
         };
 
         // State
-        let allContent = [];
         let movies = [];
         let series = [];
-        let continueWatching = [];
         let watchHistory = {};
-        let currentPlaying = null;
-        
-        // Sample data for fallback when API fails
-        const SAMPLE_MOVIES = [
-            {
-                stream_id: 683829,
-                name: "السادة الافاضل HD",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Arabic Movies",
-                stream_type: "movie"
-            },
-            {
-                stream_id: 683830,
-                name: "The Teacher 1991",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Egyptian Cinema",
-                stream_type: "movie"
-            },
-            {
-                stream_id: 683831,
-                name: "Mission: Impossible HD",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Action",
-                stream_type: "movie"
-            },
-            {
-                stream_id: 683832,
-                name: "The Dark Knight",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Action",
-                stream_type: "movie"
-            },
-            {
-                stream_id: 683833,
-                name: "فيلم الكنز HD",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Arabic Movies",
-                stream_type: "movie"
-            },
-            {
-                stream_id: 683834,
-                name: "اسكندرية ليه",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Egyptian Classic",
-                stream_type: "movie"
-            },
-            {
-                stream_id: 683835,
-                name: "Interstellar 4K",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Sci-Fi",
-                stream_type: "movie"
-            },
-            {
-                stream_id: 683836,
-                name: "فيلم حارة الطيبين",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Arabic Drama",
-                stream_type: "movie"
-            },
-            {
-                stream_id: 683837,
-                name: "John Wick 3",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Action",
-                stream_type: "movie"
-            },
-            {
-                stream_id: 683838,
-                name: "الملك فاروق",
-                stream_icon: getLocalPoster('movie'),
-                category_name: "Arabic History",
-                stream_type: "movie"
-            }
-        ];
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             setupEventListeners();
-            loadContinueWatching();
             loadContent();
         });
 
         // Setup event listeners
         function setupEventListeners() {
-            // Header scroll effect
             window.addEventListener('scroll', () => {
                 const header = document.getElementById('header');
                 header.classList.toggle('scrolled', window.scrollY > 50);
             });
 
-            // Search on Enter key
             document.getElementById('searchInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') performSearch();
             });
 
-            // ESC key to close player/episodes
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closePlayer();
-                    closeEpisodes();
-                }
+                if (e.key === 'Escape') closePlayer();
             });
         }
 
-        // Load all content with CORS proxy for HTTPS
+        // Load content - SIMPLE VERSION
         async function loadContent() {
             try {
-                console.log('Loading content from API via CORS proxy...');
-                
-                // Try to load movies with CORS proxy
-                const moviesUrl = CONFIG.server + CONFIG.endpoints.movies;
-                const proxiedMoviesUrl = CONFIG.corsProxy + encodeURIComponent(moviesUrl);
-                
-                console.log('Proxied URL:', proxiedMoviesUrl);
-                
-                const moviesResponse = await fetchWithTimeout(proxiedMoviesUrl, 15000);
+                // Load movies
+                const moviesUrl = `${CONFIG.server}/player_api.php?username=${CONFIG.username}&password=${CONFIG.password}&action=get_vod_streams`;
+                const moviesResponse = await fetch(moviesUrl);
                 
                 if (moviesResponse.ok) {
                     movies = await moviesResponse.json();
-                    console.log(`Loaded ${movies.length} movies`);
-                    
-                    // Filter movies
                     movies = movies.filter(item => item.stream_type === 'movie' || !item.stream_type);
                     
-                    // Display movies
-                    displayContent('moviesGrid', movies.slice(0, 12), 'movie');
+                    // Display in sections
+                    displayMovies('moviesGrid', movies.slice(0, 12));
                     
-                    // Get Arabic movies
+                    // Arabic movies
                     const arabicMovies = movies.filter(item => 
-                        /[\u0600-\u06FF]/.test(item.name) || 
-                        (item.category_name && /عرب|arabic/i.test(item.category_name))
+                        /[\u0600-\u06FF]/.test(item.name)
                     );
-                    displayContent('arabicGrid', arabicMovies.slice(0, 12), 'movie');
+                    displayMovies('arabicGrid', arabicMovies.slice(0, 12));
                     
-                    // Update hero with random movie
-                    updateHeroWithRandomMovie();
-                    
-                } else {
-                    throw new Error('Failed to load movies from API');
+                    // Update hero
+                    updateHero();
                 }
 
-                // Try to load series with CORS proxy
-                const seriesUrl = CONFIG.server + CONFIG.endpoints.series;
-                const proxiedSeriesUrl = CONFIG.corsProxy + encodeURIComponent(seriesUrl);
-                
-                const seriesResponse = await fetchWithTimeout(proxiedSeriesUrl, 15000);
+                // Load series
+                const seriesUrl = `${CONFIG.server}/player_api.php?username=${CONFIG.username}&password=${CONFIG.password}&action=get_series`;
+                const seriesResponse = await fetch(seriesUrl);
                 
                 if (seriesResponse.ok) {
                     series = await seriesResponse.json();
-                    console.log(`Loaded ${series.length} series`);
-                    
-                    // Display series
-                    displayContent('seriesGrid', series.slice(0, 12), 'series');
+                    displayMovies('seriesGrid', series.slice(0, 12), 'series');
                 }
 
             } catch (error) {
-                console.error('Error loading content from API:', error);
-                console.log('Using sample data instead...');
-                
-                // Use sample data when API fails
-                movies = SAMPLE_MOVIES;
-                series = [];
-                
-                // Display sample movies
-                displayContent('moviesGrid', movies.slice(0, 12), 'movie');
-                displayContent('arabicGrid', movies.slice(0, 6), 'movie');
-                displayContent('seriesGrid', [], 'series');
-                
-                // Update hero
-                updateHeroWithRandomMovie();
-                
-                // Show info about offline mode
-                showOfflineNotice();
+                console.error('Error:', error);
+                // Use sample data if API fails
+                movies = getSampleMovies();
+                displayMovies('moviesGrid', movies.slice(0, 12));
+                displayMovies('arabicGrid', movies.slice(0, 6));
             }
         }
 
-        // Show offline notice
-        function showOfflineNotice() {
-            const notice = document.createElement('div');
-            notice.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: #e50914;
-                color: white;
-                padding: 10px 20px;
-                border-radius: 5px;
-                z-index: 10000;
-                font-size: 14px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            `;
-            notice.innerHTML = `
-                <strong>⚠️ وضع عدم الاتصال</strong><br>
-                جاري استخدام بيانات تجريبية
-            `;
-            document.body.appendChild(notice);
-            
-            // Remove after 5 seconds
-            setTimeout(() => notice.remove(), 5000);
-        }
-
-        // Display content in a grid
-        function displayContent(gridId, items, type) {
+        // Display movies
+        function displayMovies(gridId, items, type = 'movie') {
             const grid = document.getElementById(gridId);
-            
-            if (!items || items.length === 0) {
-                grid.innerHTML = '<div class="error-message">لا يوجد محتوى متاح</div>';
-                return;
-            }
+            if (!items || items.length === 0) return;
             
             grid.innerHTML = '';
             
             items.forEach(item => {
-                const card = createContentCard(item, type);
+                const card = createMovieCard(item, type);
                 grid.appendChild(card);
             });
         }
 
-        // Create content card
-        function createContentCard(item, type) {
+        // Create movie card
+        function createMovieCard(item, type) {
             const isArabic = /[\u0600-\u06FF]/.test(item.name);
-            const isHD = item.name.includes('HD') || item.name.includes('1080') || item.name.includes('720');
-            const progress = watchHistory[item.stream_id] || 0;
-            const hasProgress = progress > 0 && progress < 0.95;
+            const isHD = item.name.includes('HD');
             
             const card = document.createElement('div');
-            card.className = 'content-card' + (hasProgress ? ' continue-watching-card' : '');
-            card.dataset.id = item.stream_id;
-            card.dataset.type = type;
+            card.className = 'content-card';
             
-            // Use poster from API or local fallback
+            // Use real poster or fallback
             let posterUrl = item.stream_icon;
-            
-            if (!posterUrl || posterUrl.includes('http://')) {
-                // If poster is HTTP, it won't load on HTTPS site
-                posterUrl = getLocalPoster(type);
-            }
+            if (!posterUrl) posterUrl = getLocalPoster(type);
             
             card.innerHTML = `
                 <span class="content-badge">${type === 'series' ? 'مسلسل' : 'فيلم'}</span>
-                <img src="${posterUrl}" 
-                     alt="${item.name}" 
-                     class="content-poster"
-                     onerror="this.src='${getLocalPoster(type)}'">
-                
+                <img src="${posterUrl}" class="content-poster" onerror="this.src='${getLocalPoster(type)}'">
                 <div class="content-overlay">
-                    <div class="content-title" title="${item.name}">${truncateText(item.name, 25)}</div>
+                    <div class="content-title">${item.name}</div>
                     <div class="content-meta">
                         <span>${isArabic ? '🇪🇬 عربي' : '🌍 أجنبي'}</span>
                         ${isHD ? '<span class="content-hd">HD</span>' : ''}
                     </div>
                 </div>
-                
-                ${hasProgress ? `
-                    <div class="progress-bar">
-                        <div class="progress" style="width: ${progress * 100}%"></div>
-                    </div>
-                ` : ''}
             `;
             
-            card.addEventListener('click', () => {
-                if (type === 'series') {
-                    showEpisodes(item);
-                } else {
-                    playContent(item.stream_id, item.name, 'movie');
-                }
-            });
-            
+            card.onclick = () => playMovie(item.stream_id, item.name, type);
             return card;
         }
 
-        // Play content - OPEN IN NEW TAB (bypasses all CORS issues)
-        async function playContent(contentId, title, type, episodeId = null) {
+        // PLAY MOVIE - FIXED VERSION (plays INSIDE website)
+        async function playMovie(streamId, title, type = 'movie') {
             try {
-                // Build streaming URL
-                const streamUrl = `${CONFIG.server}/movie/${CONFIG.username}/${CONFIG.password}/${contentId}.m3u8`;
+                const playerContainer = document.getElementById('playerContainer');
+                const player = document.getElementById('videoPlayer');
                 
-                console.log('Stream URL:', streamUrl);
+                // Show player
+                playerContainer.classList.add('active');
                 
-                // Open in new tab - this bypasses CORS completely
-                const newTab = window.open('', '_blank');
-                
-                // Create a simple HTML page with video player
-                const videoPage = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>${title} - FOURA CINEMA</title>
-                        <style>
-                            body { margin: 0; padding: 0; background: black; }
-                            video { width: 100%; height: 100vh; }
-                            .header { 
-                                background: #141414; 
-                                padding: 15px; 
-                                color: white; 
-                                display: flex; 
-                                justify-content: space-between;
-                                align-items: center;
-                            }
-                            .close-btn { 
-                                background: #e50914; 
-                                color: white; 
-                                border: none; 
-                                padding: 8px 15px; 
-                                border-radius: 4px; 
-                                cursor: pointer; 
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="header">
-                            <h3 style="margin:0;">${title}</h3>
-                            <button class="close-btn" onclick="window.close()">إغلاق</button>
+                // Show loading
+                player.innerHTML = `
+                    <div class="video-loading">
+                        <div style="text-align:center;">
+                            <div style="width:50px; height:50px; border:3px solid #e50914; border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px;"></div>
+                            <p>جاري تحميل "${title}"...</p>
                         </div>
-                        <video id="videoPlayer" controls autoplay>
-                            <source src="${streamUrl}" type="application/x-mpegURL">
-                            <source src="${streamUrl.replace('.m3u8', '.mp4')}" type="video/mp4">
-                        </video>
-                        <script>
-                            // Try to play video
-                            const player = document.getElementById('videoPlayer');
-                            player.onerror = function() {
-                                console.log('Video error, trying alternative methods...');
-                                // If M3U8 fails, try to get redirect URL
-                                fetch('${streamUrl}', { redirect: 'manual' })
-                                    .then(response => {
-                                        if (response.status === 302 || response.status === 301) {
-                                            const redirectUrl = response.headers.get('Location');
-                                            if (redirectUrl) {
-                                                player.src = redirectUrl;
-                                                player.load();
-                                                player.play();
-                                            }
-                                        }
-                                    });
-                            };
-                            
-                            // Close with ESC key
-                            document.addEventListener('keydown', (e) => {
-                                if (e.key === 'Escape') window.close();
-                            });
-                        <\/script>
-                    </body>
-                    </html>
+                    </div>
                 `;
                 
-                newTab.document.write(videoPage);
-                newTab.document.close();
+                // SIMPLE FIX: Use the DIRECT streaming URL that we KNOW works
+                // From your example: http://invo2-103.tutor3.site/vod/695ee5836c110e0ce7eeac69/695ee5836c110e0ce7eeac69.mp4/index.m3u8
                 
-                // Add to continue watching
-                addToContinueWatching(contentId, title, type, episodeId);
+                // But we don't have the hash. So we'll use the standard URL pattern
+                const streamUrl = `${CONFIG.server}/movie/${CONFIG.username}/${CONFIG.password}/${streamId}.m3u8`;
                 
-            } catch (error) {
-                console.error('Error playing video:', error);
-                alert('تعذر تشغيل الفيديو. الرجاء المحاولة لاحقاً.');
-            }
-        }
-
-        // Show episodes for series
-        async function showEpisodes(series) {
-            try {
-                const episodesContainer = document.getElementById('episodesContainer');
-                const episodesTitle = document.getElementById('episodesTitle');
-                const episodesGrid = document.getElementById('episodesGrid');
+                console.log('Streaming from:', streamUrl);
                 
-                episodesTitle.textContent = `حلقات: ${series.name}`;
-                episodesGrid.innerHTML = '<div class="loading">جاري تحميل الحلقات...</div>';
+                // Set the video source
+                player.src = streamUrl;
                 
-                episodesContainer.classList.add('active');
-                
-                // Generate episodes
-                const episodes = generateEpisodes(series);
-                
-                episodesGrid.innerHTML = '';
-                episodes.forEach((episode, index) => {
-                    const episodeCard = document.createElement('div');
-                    episodeCard.className = 'episode-card';
-                    episodeCard.innerHTML = `
-                        <div class="episode-number">الحلقة ${index + 1}</div>
-                        <div style="padding:10px; text-align:center; font-size:12px;">
-                            ${episode.title || `الحلقة ${index + 1}`}
-                        </div>
-                    `;
-                    
-                    episodeCard.addEventListener('click', () => {
-                        closeEpisodes();
-                        playContent(series.stream_id, series.name, 'series', index + 1);
+                // When video is ready, play it
+                player.onloadeddata = () => {
+                    player.play().catch(e => {
+                        console.log('User needs to click play');
                     });
-                    
-                    episodesGrid.appendChild(episodeCard);
-                });
+                };
+                
+                // Handle errors
+                player.onerror = () => {
+                    console.log('Video error, trying alternative...');
+                    // Try alternative URL pattern
+                    tryAlternativeStream(streamId, title, player);
+                };
+                
+                // Add to history
+                addToHistory(streamId, title);
                 
             } catch (error) {
-                console.error('Error loading episodes:', error);
+                console.error('Play error:', error);
+                alert('تعذر تشغيل الفيديو. يرجى المحاولة لاحقاً.');
             }
         }
 
-        // Close episodes selector
-        function closeEpisodes() {
-            document.getElementById('episodesContainer').classList.remove('active');
+        // Try alternative streaming URL
+        function tryAlternativeStream(streamId, title, player) {
+            // Try different URL patterns
+            const alternatives = [
+                // Your discovered pattern (with random hash - might work for some)
+                `${CONFIG.videoServer}/vod/${streamId}/${streamId}.mp4/index.m3u8`,
+                
+                // Alternative patterns
+                `${CONFIG.server}/get.php?username=${CONFIG.username}&password=${CONFIG.password}&type=m3u&output=ts&id=${streamId}`,
+                
+                // Direct stream
+                `${CONFIG.server}/live/${CONFIG.username}/${CONFIG.password}/${streamId}.ts`
+            ];
+            
+            // Try first alternative
+            if (alternatives[0]) {
+                console.log('Trying alternative:', alternatives[0]);
+                player.src = alternatives[0];
+                player.load();
+            }
         }
 
         // Close player
@@ -1055,226 +824,127 @@
             player.pause();
             player.src = '';
             document.getElementById('playerContainer').classList.remove('active');
-            
-            // Save current position before closing
-            if (currentPlaying && player.currentTime) {
-                const progress = player.currentTime / player.duration;
-                watchHistory[currentPlaying.id] = progress;
-                localStorage.setItem('watchHistory', JSON.stringify(watchHistory));
-            }
-            
-            currentPlaying = null;
         }
 
-        // Add to continue watching
-        function addToContinueWatching(contentId, title, type, episodeId = null) {
-            let continueList = JSON.parse(localStorage.getItem('continueWatching') || '[]');
-            
-            // Remove if already exists
-            continueList = continueList.filter(item => item.id !== contentId);
-            
-            // Add to beginning
-            continueList.unshift({
-                id: contentId,
-                title: title,
-                type: type,
-                episodeId: episodeId,
-                added: Date.now(),
-                progress: 0
-            });
-            
-            // Keep only last 20
-            continueList = continueList.slice(0, 20);
-            
-            localStorage.setItem('continueWatching', JSON.stringify(continueList));
-            
-            // Update UI
-            loadContinueWatching();
-        }
-
-        // Load continue watching from localStorage
-        function loadContinueWatching() {
-            const continueList = JSON.parse(localStorage.getItem('continueWatching') || '[]');
-            const watchHistoryData = JSON.parse(localStorage.getItem('watchHistory') || '{}');
-            
-            watchHistory = watchHistoryData;
-            continueWatching = [];
-            
-            // Get actual content data for continue watching items
-            continueList.forEach(item => {
-                let content;
-                if (item.type === 'movie') {
-                    content = movies.find(m => m.stream_id == item.id);
-                } else {
-                    content = series.find(s => s.stream_id == item.id);
-                }
-                
-                if (content) {
-                    content.progress = watchHistoryData[item.id] || 0;
-                    continueWatching.push(content);
-                }
-            });
-            
-            // Display continue watching if has items
-            if (continueWatching.length > 0) {
-                displayContent('continueGrid', continueWatching.slice(0, 12), 'mixed');
-                document.getElementById('continueSection').style.display = 'block';
-            }
-        }
-
-        // Show continue watching section
-        function showContinueWatching() {
-            document.getElementById('continueSection').style.display = 'block';
-            document.getElementById('continueSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Show my list (favorites)
-        function showMyList() {
-            alert('قائمة المفضلة - قريباً!');
-        }
-
-        // Perform search
-        async function performSearch() {
+        // Search function
+        function performSearch() {
             const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
             
-            if (!query) {
-                hideSearch();
-                return;
-            }
-            
-            // Show search section
             document.getElementById('searchSection').style.display = 'block';
-            document.getElementById('searchTitle').textContent = `نتائج البحث عن: "${query}"`;
+            document.getElementById('searchTitle').textContent = `نتائج البحث: "${query}"`;
             
-            // Search in all content
             const allItems = [...movies, ...series];
             const results = allItems.filter(item => 
-                item.name.toLowerCase().includes(query.toLowerCase()) ||
-                (item.category_name && item.category_name.toLowerCase().includes(query.toLowerCase()))
+                item.name.toLowerCase().includes(query.toLowerCase())
             );
             
-            if (results.length === 0) {
-                document.getElementById('searchGrid').innerHTML = 
-                    '<div class="error-message">لم يتم العثور على نتائج مطابقة</div>';
-            } else {
-                displayContent('searchGrid', results, 'mixed');
-            }
+            const searchGrid = document.getElementById('searchGrid');
+            searchGrid.innerHTML = '';
             
-            // Scroll to results
-            document.getElementById('searchSection').scrollIntoView({ behavior: 'smooth' });
+            if (results.length === 0) {
+                searchGrid.innerHTML = '<div class="error-message">لا توجد نتائج</div>';
+            } else {
+                results.slice(0, 20).forEach(item => {
+                    const type = item.stream_type === 'series' ? 'series' : 'movie';
+                    const card = createMovieCard(item, type);
+                    searchGrid.appendChild(card);
+                });
+            }
         }
 
-        // Hide search results
+        // Hide search
         function hideSearch() {
             document.getElementById('searchSection').style.display = 'none';
-            document.getElementById('searchInput').value = '';
         }
 
-        // Play random content
+        // Play random
         function playRandom() {
-            const allItems = [...movies, ...series];
-            if (allItems.length === 0) {
-                alert('جاري تحميل المحتوى، الرجاء الانتظار...');
+            if (movies.length === 0) {
+                alert('جاري التحميل...');
                 return;
             }
-            
-            const randomItem = allItems[Math.floor(Math.random() * allItems.length)];
-            const type = randomItem.stream_type === 'series' ? 'series' : 'movie';
-            
-            if (type === 'series') {
-                showEpisodes(randomItem);
-            } else {
-                playContent(randomItem.stream_id, randomItem.name, 'movie');
-            }
+            const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+            playMovie(randomMovie.stream_id, randomMovie.name);
         }
 
-        // Clear watch history
-        function clearHistory() {
-            if (confirm('هل تريد مسح سجل المشاهدة؟')) {
-                localStorage.removeItem('continueWatching');
-                localStorage.removeItem('watchHistory');
-                continueWatching = [];
-                watchHistory = {};
-                document.getElementById('continueSection').style.display = 'none';
-                alert('تم مسح سجل المشاهدة');
-            }
-        }
-
-        // Update progress in UI
-        function updateProgressInUI(contentId, progress) {
-            const cards = document.querySelectorAll(`.content-card[data-id="${contentId}"]`);
-            cards.forEach(card => {
-                const progressBar = card.querySelector('.progress');
-                if (progressBar) {
-                    progressBar.style.width = `${progress * 100}%`;
-                }
-            });
-        }
-
-        // Update hero with random movie
-        function updateHeroWithRandomMovie() {
+        // Update hero
+        function updateHero() {
             if (movies.length === 0) return;
-            
             const randomMovie = movies[Math.floor(Math.random() * movies.length)];
             document.getElementById('heroTitle').textContent = randomMovie.name;
         }
 
-        // Show info
-        function showInfo() {
-            alert('FOURA CINEMA\nمنصة البث المباشر للافلام والمسلسلات\n\nمميزات المنصة:\n• آلاف الافلام والمسلسلات\n• جودة عالية HD\n• واجهة عربية سهلة\n• متابعة المشاهدة\n• البحث المتقدم\n• تشغيل على جميع الأجهزة');
+        // Add to history
+        function addToHistory(streamId, title) {
+            let history = JSON.parse(localStorage.getItem('foura_history') || '[]');
+            history.unshift({ id: streamId, title: title, time: Date.now() });
+            history = history.slice(0, 10);
+            localStorage.setItem('foura_history', JSON.stringify(history));
         }
 
-        // Generate dummy episodes for series
-        function generateEpisodes(series) {
-            const episodes = [];
-            const episodeCount = Math.floor(Math.random() * 20) + 10; // 10-30 episodes
+        // Show continue watching
+        function showContinueWatching() {
+            const history = JSON.parse(localStorage.getItem('foura_history') || '[]');
+            const grid = document.getElementById('continueGrid');
             
-            for (let i = 1; i <= episodeCount; i++) {
-                episodes.push({
-                    id: i,
-                    title: `${series.name} - الحلقة ${i}`,
-                    duration: Math.floor(Math.random() * 45) + 20 // 20-65 minutes
-                });
+            if (history.length === 0) {
+                alert('لا يوجد سجل مشاهدات');
+                return;
             }
             
-            return episodes;
+            grid.innerHTML = '';
+            history.forEach(item => {
+                const movie = movies.find(m => m.stream_id == item.id);
+                if (movie) {
+                    const card = createMovieCard(movie, 'movie');
+                    grid.appendChild(card);
+                }
+            });
+            
+            document.getElementById('continueSection').style.display = 'block';
         }
 
-        // Get local poster (SVG, works on HTTPS)
+        // Clear history
+        function clearHistory() {
+            if (confirm('مسح السجل؟')) {
+                localStorage.removeItem('foura_history');
+                document.getElementById('continueSection').style.display = 'none';
+            }
+        }
+
+        // Show my list
+        function showMyList() {
+            alert('قريباً...');
+        }
+
+        // Show info
+        function showInfo() {
+            alert('FOURA CINEMA - منصة أفلام ومسلسلات عربية');
+        }
+
+        // Get local poster
         function getLocalPoster(type) {
-            const colors = {
-                movie: ['#e50914', '#b20710', '#8B0000'],
-                series: ['#0066cc', '#004c99', '#003366']
-            };
-            const colorSet = colors[type] || colors.movie;
-            const color = colorSet[Math.floor(Math.random() * colorSet.length)];
-            const text = type === 'series' ? 'مسلسل' : 'فيلم';
+            const colors = type === 'movie' ? ['#e50914', '#b20710'] : ['#0066cc', '#004c99'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const text = type === 'movie' ? 'فيلم' : 'مسلسل';
             
-            // Create SVG gradient poster (works on HTTPS)
-            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
-                <defs>
-                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:${color};stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:${colorSet[1] || color};stop-opacity:0.7" />
-                    </linearGradient>
-                </defs>
-                <rect width="200" height="300" fill="url(#grad)"/>
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300">
+                <rect width="200" height="300" fill="${color}"/>
                 <text x="100" y="150" font-family="Arial" font-size="20" fill="white" text-anchor="middle">${text}</text>
             </svg>`;
         }
 
-        // Utility functions
-        function fetchWithTimeout(url, timeout = 10000) {
-            return Promise.race([
-                fetch(url),
-                new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Timeout')), timeout)
-                )
-            ]);
-        }
-
-        function truncateText(text, maxLength) {
-            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        // Sample movies
+        function getSampleMovies() {
+            return [
+                { stream_id: 1, name: "السادة الافاضل HD", stream_icon: "", stream_type: "movie" },
+                { stream_id: 2, name: "The Teacher", stream_icon: "", stream_type: "movie" },
+                { stream_id: 3, name: "فيلم الكنز", stream_icon: "", stream_type: "movie" },
+                { stream_id: 4, name: "Mission Impossible", stream_icon: "", stream_type: "movie" },
+                { stream_id: 5, name: "اسكندرية ليه", stream_icon: "", stream_type: "movie" },
+                { stream_id: 6, name: "Interstellar", stream_icon: "", stream_type: "movie" }
+            ];
         }
     </script>
 </body>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FOURA CINEMA | فورا سينما</title>
     <style>
-        /* Foura Cinema Theme - Modern Arabic Design */
+ /* Foura Cinema Theme - Modern Arabic Design */
         :root {
             --primary: #e50914;
             --primary-dark: #b20710;
@@ -521,6 +521,7 @@
             text-align: center;
             padding: 20px;
         }
+        
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 </head>
@@ -624,18 +625,18 @@
     </div>
 
     <script>
-        // Configuration
+        // Configuration - FIXED FOR HTTPS
         const CONFIG = {
             username: 'xadel99320',
             password: '01070115953',
             server: 'http://sa.savpn.xyz',
-            // Video server discovered from your redirect
             videoServer: 'http://invo2-103.tutor3.site',
+            // HTTPS Proxy to fix mixed content issues on GitHub Pages
+            corsProxy: 'https://api.allorigins.win/raw?url=',
+            corsProxyAlt: 'https://corsproxy.io/?',
             endpoints: {
                 movies: '/player_api.php?username=xadel99320&password=01070115953&action=get_vod_streams',
-                series: '/player_api.php?username=xadel99320&password=01070115953&action=get_series',
-                categories: '/player_api.php?username=xadel99320&password=01070115953&action=get_vod_categories',
-                seriesInfo: '/player_api.php?username=xadel99320&password=01070115953&action=get_series_info&series_id='
+                series: '/player_api.php?username=xadel99320&password=01070115953&action=get_series'
             }
         };
 
@@ -646,6 +647,80 @@
         let continueWatching = [];
         let watchHistory = {};
         let currentPlaying = null;
+        
+        // Sample data for fallback when API fails
+        const SAMPLE_MOVIES = [
+            {
+                stream_id: 683829,
+                name: "السادة الافاضل HD",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Arabic Movies",
+                stream_type: "movie"
+            },
+            {
+                stream_id: 683830,
+                name: "The Teacher 1991",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Egyptian Cinema",
+                stream_type: "movie"
+            },
+            {
+                stream_id: 683831,
+                name: "Mission: Impossible HD",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Action",
+                stream_type: "movie"
+            },
+            {
+                stream_id: 683832,
+                name: "The Dark Knight",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Action",
+                stream_type: "movie"
+            },
+            {
+                stream_id: 683833,
+                name: "فيلم الكنز HD",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Arabic Movies",
+                stream_type: "movie"
+            },
+            {
+                stream_id: 683834,
+                name: "اسكندرية ليه",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Egyptian Classic",
+                stream_type: "movie"
+            },
+            {
+                stream_id: 683835,
+                name: "Interstellar 4K",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Sci-Fi",
+                stream_type: "movie"
+            },
+            {
+                stream_id: 683836,
+                name: "فيلم حارة الطيبين",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Arabic Drama",
+                stream_type: "movie"
+            },
+            {
+                stream_id: 683837,
+                name: "John Wick 3",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Action",
+                stream_type: "movie"
+            },
+            {
+                stream_id: 683838,
+                name: "الملك فاروق",
+                stream_icon: getLocalPoster('movie'),
+                category_name: "Arabic History",
+                stream_type: "movie"
+            }
+        ];
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -676,20 +751,24 @@
             });
         }
 
-        // Load all content
+        // Load all content with CORS proxy for HTTPS
         async function loadContent() {
             try {
-                console.log('Loading content from API...');
+                console.log('Loading content from API via CORS proxy...');
                 
-                // Try to load movies
+                // Try to load movies with CORS proxy
                 const moviesUrl = CONFIG.server + CONFIG.endpoints.movies;
-                const moviesResponse = await fetchWithTimeout(moviesUrl, 10000);
+                const proxiedMoviesUrl = CONFIG.corsProxy + encodeURIComponent(moviesUrl);
+                
+                console.log('Proxied URL:', proxiedMoviesUrl);
+                
+                const moviesResponse = await fetchWithTimeout(proxiedMoviesUrl, 15000);
                 
                 if (moviesResponse.ok) {
                     movies = await moviesResponse.json();
                     console.log(`Loaded ${movies.length} movies`);
                     
-                    // Filter movies (remove series if mixed)
+                    // Filter movies
                     movies = movies.filter(item => item.stream_type === 'movie' || !item.stream_type);
                     
                     // Display movies
@@ -704,11 +783,16 @@
                     
                     // Update hero with random movie
                     updateHeroWithRandomMovie();
+                    
+                } else {
+                    throw new Error('Failed to load movies from API');
                 }
 
-                // Try to load series
+                // Try to load series with CORS proxy
                 const seriesUrl = CONFIG.server + CONFIG.endpoints.series;
-                const seriesResponse = await fetchWithTimeout(seriesUrl, 10000);
+                const proxiedSeriesUrl = CONFIG.corsProxy + encodeURIComponent(seriesUrl);
+                
+                const seriesResponse = await fetchWithTimeout(proxiedSeriesUrl, 15000);
                 
                 if (seriesResponse.ok) {
                     series = await seriesResponse.json();
@@ -719,9 +803,49 @@
                 }
 
             } catch (error) {
-                console.error('Error loading content:', error);
-                showError('تعذر تحميل المحتوى. تحقق من اتصالك بالإنترنت.');
+                console.error('Error loading content from API:', error);
+                console.log('Using sample data instead...');
+                
+                // Use sample data when API fails
+                movies = SAMPLE_MOVIES;
+                series = [];
+                
+                // Display sample movies
+                displayContent('moviesGrid', movies.slice(0, 12), 'movie');
+                displayContent('arabicGrid', movies.slice(0, 6), 'movie');
+                displayContent('seriesGrid', [], 'series');
+                
+                // Update hero
+                updateHeroWithRandomMovie();
+                
+                // Show info about offline mode
+                showOfflineNotice();
             }
+        }
+
+        // Show offline notice
+        function showOfflineNotice() {
+            const notice = document.createElement('div');
+            notice.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: #e50914;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                z-index: 10000;
+                font-size: 14px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            `;
+            notice.innerHTML = `
+                <strong>⚠️ وضع عدم الاتصال</strong><br>
+                جاري استخدام بيانات تجريبية
+            `;
+            document.body.appendChild(notice);
+            
+            // Remove after 5 seconds
+            setTimeout(() => notice.remove(), 5000);
         }
 
         // Display content in a grid
@@ -741,7 +865,7 @@
             });
         }
 
-        // Create content card with FIXED poster handling
+        // Create content card
         function createContentCard(item, type) {
             const isArabic = /[\u0600-\u06FF]/.test(item.name);
             const isHD = item.name.includes('HD') || item.name.includes('1080') || item.name.includes('720');
@@ -753,11 +877,11 @@
             card.dataset.id = item.stream_id;
             card.dataset.type = type;
             
-            // Use REAL poster from API - but handle errors properly
+            // Use poster from API or local fallback
             let posterUrl = item.stream_icon;
             
-            // Check if poster URL is valid
-            if (!posterUrl || posterUrl.includes('placeholder.com')) {
+            if (!posterUrl || posterUrl.includes('http://')) {
+                // If poster is HTTP, it won't load on HTTPS site
                 posterUrl = getLocalPoster(type);
             }
             
@@ -766,7 +890,7 @@
                 <img src="${posterUrl}" 
                      alt="${item.name}" 
                      class="content-poster"
-                     onerror="handlePosterError(this, '${type}')">
+                     onerror="this.src='${getLocalPoster(type)}'">
                 
                 <div class="content-overlay">
                     <div class="content-title" title="${item.name}">${truncateText(item.name, 25)}</div>
@@ -794,200 +918,91 @@
             return card;
         }
 
-        // Handle poster loading errors
-        function handlePosterError(imgElement, type) {
-            console.log('Poster failed to load, using local poster');
-            imgElement.src = getLocalPoster(type);
-            imgElement.onerror = null; // Remove error handler to prevent loop
-        }
-
-        // Play content - USING CORRECT VIDEO URL
+        // Play content - OPEN IN NEW TAB (bypasses all CORS issues)
         async function playContent(contentId, title, type, episodeId = null) {
             try {
-                const playerContainer = document.getElementById('playerContainer');
-                const player = document.getElementById('videoPlayer');
+                // Build streaming URL
+                const streamUrl = `${CONFIG.server}/movie/${CONFIG.username}/${CONFIG.password}/${contentId}.m3u8`;
                 
-                // Show loading
-                playerContainer.classList.add('active');
-                player.innerHTML = `
-                    <div style="display:flex; align-items:center; justify-content:center; height:100%;">
-                        <div style="text-align:center;">
-                            <div style="width:50px; height:50px; border:3px solid #e50914; border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px;"></div>
-                            <p style="color:white;">جاري تحميل "${title}"...</p>
+                console.log('Stream URL:', streamUrl);
+                
+                // Open in new tab - this bypasses CORS completely
+                const newTab = window.open('', '_blank');
+                
+                // Create a simple HTML page with video player
+                const videoPage = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>${title} - FOURA CINEMA</title>
+                        <style>
+                            body { margin: 0; padding: 0; background: black; }
+                            video { width: 100%; height: 100vh; }
+                            .header { 
+                                background: #141414; 
+                                padding: 15px; 
+                                color: white; 
+                                display: flex; 
+                                justify-content: space-between;
+                                align-items: center;
+                            }
+                            .close-btn { 
+                                background: #e50914; 
+                                color: white; 
+                                border: none; 
+                                padding: 8px 15px; 
+                                border-radius: 4px; 
+                                cursor: pointer; 
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h3 style="margin:0;">${title}</h3>
+                            <button class="close-btn" onclick="window.close()">إغلاق</button>
                         </div>
-                    </div>
+                        <video id="videoPlayer" controls autoplay>
+                            <source src="${streamUrl}" type="application/x-mpegURL">
+                            <source src="${streamUrl.replace('.m3u8', '.mp4')}" type="video/mp4">
+                        </video>
+                        <script>
+                            // Try to play video
+                            const player = document.getElementById('videoPlayer');
+                            player.onerror = function() {
+                                console.log('Video error, trying alternative methods...');
+                                // If M3U8 fails, try to get redirect URL
+                                fetch('${streamUrl}', { redirect: 'manual' })
+                                    .then(response => {
+                                        if (response.status === 302 || response.status === 301) {
+                                            const redirectUrl = response.headers.get('Location');
+                                            if (redirectUrl) {
+                                                player.src = redirectUrl;
+                                                player.load();
+                                                player.play();
+                                            }
+                                        }
+                                    });
+                            };
+                            
+                            // Close with ESC key
+                            document.addEventListener('keydown', (e) => {
+                                if (e.key === 'Escape') window.close();
+                            });
+                        <\/script>
+                    </body>
+                    </html>
                 `;
                 
-                // DISCOVERED: Videos are on tutor3.site, not sa.savpn.xyz
-                // From your example: http://invo2-103.tutor3.site/vod/695ee5836c110e0ce7eeac69/695ee5836c110e0ce7eeac69.mp4/index.m3u8
-                
-                // Try different URL patterns until one works
-                const videoUrls = [
-                    // Pattern from your redirect (most likely to work)
-                    `${CONFIG.videoServer}/vod/${contentId}/${contentId}.mp4/index.m3u8`,
-                    
-                    // Alternative patterns
-                    `${CONFIG.videoServer}/movie/${CONFIG.username}/${CONFIG.password}/${contentId}.m3u8`,
-                    `${CONFIG.videoServer}/stream/${contentId}.m3u8`,
-                    `${CONFIG.videoServer}/${contentId}.m3u8`,
-                    
-                    // Original pattern (might work sometimes)
-                    `${CONFIG.server}/movie/${CONFIG.username}/${CONFIG.password}/${contentId}.m3u8`
-                ];
-                
-                console.log('Trying video URLs:', videoUrls);
-                
-                let workingUrl = null;
-                
-                // Try each URL until one works
-                for (let url of videoUrls) {
-                    try {
-                        console.log('Testing URL:', url);
-                        const response = await fetch(url, { method: 'HEAD' });
-                        if (response.ok) {
-                            workingUrl = url;
-                            console.log('Found working URL:', url);
-                            break;
-                        }
-                    } catch (e) {
-                        console.log('URL failed:', url, e.message);
-                        continue;
-                    }
-                }
-                
-                if (!workingUrl) {
-                    throw new Error('لم يتم العثور على رابط تشغيل للفيديو');
-                }
-                
-                // Set video source to working URL
-                player.src = workingUrl;
-                player.load();
-                
-                // Auto-play when ready
-                player.oncanplay = () => {
-                    player.play().catch(e => {
-                        console.log('Autoplay prevented, user needs to click play');
-                    });
-                };
-                
-                // Save as currently playing
-                currentPlaying = {
-                    id: contentId,
-                    title: title,
-                    type: type,
-                    episodeId: episodeId,
-                    startTime: Date.now(),
-                    videoUrl: workingUrl
-                };
+                newTab.document.write(videoPage);
+                newTab.document.close();
                 
                 // Add to continue watching
                 addToContinueWatching(contentId, title, type, episodeId);
                 
-                // Track progress
-                player.addEventListener('timeupdate', () => {
-                    if (player.duration) {
-                        const progress = player.currentTime / player.duration;
-                        watchHistory[contentId] = progress;
-                        localStorage.setItem('watchHistory', JSON.stringify(watchHistory));
-                        
-                        // Update progress in UI if still visible
-                        updateProgressInUI(contentId, progress);
-                    }
-                });
-                
-                // When video ends
-                player.addEventListener('ended', () => {
-                    watchHistory[contentId] = 1; // Mark as completed
-                    localStorage.setItem('watchHistory', JSON.stringify(watchHistory));
-                    
-                    // If series, play next episode
-                    if (type === 'series' && episodeId) {
-                        const currentEpisode = parseInt(episodeId);
-                        setTimeout(() => playContent(contentId, title, 'series', currentEpisode + 1), 2000);
-                    }
-                });
-                
-                // Handle video errors
-                player.onerror = (e) => {
-                    console.error('Video player error:', e);
-                    player.innerHTML = `
-                        <div style="display:flex; align-items:center; justify-content:center; height:100%;">
-                            <div style="text-align:center; color:#e50914;">
-                                <p style="font-size:24px; margin-bottom:20px;">⚠️</p>
-                                <p>تعذر تشغيل الفيديو</p>
-                                <p style="font-size:14px; color:#999; margin-top:10px;">قد يكون الرابط غير صالح أو المحتوى غير متاح</p>
-                                <button onclick="tryAlternativeUrl('${contentId}', '${title}', '${type}', '${episodeId}')" 
-                                        style="background:#e50914; color:white; border:none; padding:10px 20px; border-radius:4px; margin-top:20px; cursor:pointer;">
-                                    حاول رابط آخر
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                };
-                
             } catch (error) {
-                console.error('Play error:', error);
-                const player = document.getElementById('videoPlayer');
-                player.innerHTML = `
-                    <div style="display:flex; align-items:center; justify-content:center; height:100%;">
-                        <div style="text-align:center; color:#e50914;">
-                            <p style="font-size:24px; margin-bottom:20px;">⚠️</p>
-                            <p>${error.message}</p>
-                            <p style="font-size:14px; color:#999; margin-top:10px;">جاري البحث عن رابط تشغيل بديل...</p>
-                            <button onclick="retryPlay('${contentId}', '${title}', '${type}', '${episodeId}')" 
-                                    style="background:#e50914; color:white; border:none; padding:10px 20px; border-radius:4px; margin-top:20px; cursor:pointer;">
-                                إعادة المحاولة
-                            </button>
-                        </div>
-                    </div>
-                `;
+                console.error('Error playing video:', error);
+                alert('تعذر تشغيل الفيديو. الرجاء المحاولة لاحقاً.');
             }
-        }
-
-        // Try alternative video URL
-        async function tryAlternativeUrl(contentId, title, type, episodeId = null) {
-            console.log('Trying alternative URL for:', contentId);
-            
-            // Generate alternative URL patterns
-            const patterns = [
-                // Try different server paths
-                `http://invo2-103.tutor3.site/vod/${contentId}/${contentId}.mp4/master.m3u8`,
-                `http://invo2-103.tutor3.site/vod/${contentId}/index.m3u8`,
-                `http://invo2-103.tutor3.site/${contentId}/master.m3u8`,
-                
-                // Try with session parameter (from your example)
-                `http://invo2-103.tutor3.site/vod/${contentId}/${contentId}.mp4/index.m3u8?session=test&location=local`,
-                
-                // Original API server with different paths
-                `${CONFIG.server}/get.php?username=${CONFIG.username}&password=${CONFIG.password}&type=m3u8&id=${contentId}`,
-                `${CONFIG.server}/live/${CONFIG.username}/${CONFIG.password}/${contentId}.m3u8`
-            ];
-            
-            for (let url of patterns) {
-                try {
-                    console.log('Testing alternative URL:', url);
-                    const response = await fetch(url, { method: 'HEAD' });
-                    if (response.ok) {
-                        console.log('Alternative URL works:', url);
-                        
-                        // Update player with new URL
-                        const player = document.getElementById('videoPlayer');
-                        player.src = url;
-                        player.load();
-                        player.play();
-                        return;
-                    }
-                } catch (e) {
-                    console.log('Alternative URL failed:', url);
-                }
-            }
-            
-            alert('لم نتمكن من العثور على رابط تشغيل يعمل لهذا المحتوى.');
-        }
-
-        // Retry play function
-        function retryPlay(contentId, title, type, episodeId = null) {
-            playContent(contentId, title, type, episodeId);
         }
 
         // Show episodes for series
@@ -1202,11 +1217,6 @@
             
             const randomMovie = movies[Math.floor(Math.random() * movies.length)];
             document.getElementById('heroTitle').textContent = randomMovie.name;
-            
-            if (randomMovie.stream_icon && !randomMovie.stream_icon.includes('placeholder.com')) {
-                document.getElementById('heroSection').style.backgroundImage = 
-                    `linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.4)), url('${randomMovie.stream_icon}')`;
-            }
         }
 
         // Show info
@@ -1230,9 +1240,8 @@
             return episodes;
         }
 
-        // Get local poster (NOT placeholder.com)
+        // Get local poster (SVG, works on HTTPS)
         function getLocalPoster(type) {
-            // Use SVG gradients instead of external placeholder.com
             const colors = {
                 movie: ['#e50914', '#b20710', '#8B0000'],
                 series: ['#0066cc', '#004c99', '#003366']
@@ -1241,7 +1250,7 @@
             const color = colorSet[Math.floor(Math.random() * colorSet.length)];
             const text = type === 'series' ? 'مسلسل' : 'فيلم';
             
-            // Create SVG gradient poster
+            // Create SVG gradient poster (works on HTTPS)
             return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
                 <defs>
                     <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1266,17 +1275,6 @@
 
         function truncateText(text, maxLength) {
             return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-        }
-
-        function showError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.innerHTML = `
-                <p>${message}</p>
-                <button class="retry-btn" onclick="location.reload()">إعادة المحاولة</button>
-            `;
-            
-            document.body.prepend(errorDiv);
         }
     </script>
 </body>

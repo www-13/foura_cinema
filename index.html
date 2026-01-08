@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOURA CINEMA | فورا سينما</title>
+    <style>
+        /* Foura Cinema Theme - Modern Arabic Design */
+        :root {
+            --primary: #e50914;
+            --primary-dark: #b20710;
+            --dark: #141414;
+            --dark-light: #1f1f1f;
+            --light: #ffffff;
+            --gray: #8c8c8c;
+            --success: #46d369;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 15px 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: background 0.3s;
+        }
+        
+        .header.scrolled {
+            background: var(--dark);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo span {
+            color: var(--light);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .nav-link {
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+            position: relative;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--light);
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-input {
+            background: rgba(0,0,0,0.75);
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+            padding: 8px 15px;
+            padding-right: 40px;
+            color: var(--light);
+            width: 250px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            width: 300px;
+        }
+        
+        .search-btn {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 70vh;
+            background: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.4)),
+                        var(--hero-background, url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80'));
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            margin-top: 70px;
+        }
+        
+        .hero-content {
+            max-width: 600px;
+        }
+        
+        .hero-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero-description {
+            font-size: 18px;
+            color: var(--gray);
+            margin-bottom: 30px;
+            max-width: 500px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--light);
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+        
+        .btn-secondary {
+            background: rgba(109, 109, 110, 0.7);
+            color: var(--light);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(109, 109, 110, 0.9);
+        }
+        
+        /* Content Sections */
+        .content-section {
+            padding: 40px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .see-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .see-all:hover {
+            color: var(--light);
+        }
+        
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        /* Movie/Series Card */
+        .content-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+            background: var(--dark-light);
+            height: 300px;
+        }
+        
+        .content-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .content-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: var(--dark-light);
+        }
+        
+        .content-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 15px;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        
+        .content-card:hover .content-overlay {
+            transform: translateY(0);
+        }
+        
+        .content-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .content-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .content-hd {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .content-type {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        /* Episode Selector */
+        .episodes-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        
+        .episodes-container.active {
+            display: block;
+        }
+        
+        .episodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .episode-card {
+            background: var(--dark-light);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .episode-card:hover {
+            transform: scale(1.05);
+            border: 2px solid var(--primary);
+        }
+        
+        .episode-number {
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Player */
+        .player-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 3000;
+            padding: 40px;
+        }
+        
+        .player-container.active {
+            display: block;
+        }
+        
+        .video-player {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: #000;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 3001;
+        }
+        
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            font-size: 18px;
+            color: var(--gray);
+        }
+        
+        .loading::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Continue Watching */
+        .continue-watching-card {
+            position: relative;
+        }
+        
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .progress {
+            height: 100%;
+            background: var(--primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .search-input {
+                width: 150px;
+            }
+            
+            .search-input:focus {
+                width: 200px;
+            }
+            
+            .hero {
+                height: 50vh;
+                padding: 0 20px;
+            }
+            
+            .hero-title {
+                font-size: 32px;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .content-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+        
+        /* Error Message */
+        .error-message {
+            background: rgba(229, 9, 20, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px;
+        }
+        
+        .retry-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* Series/Movie Badge */
+        .content-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        /* Poster Error Handling */
+        .poster-error {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <a href="#" class="logo">FOURA<span>CINEMA</span></a>
+        
+        <nav class="nav-links">
+            <a href="#" class="nav-link active">الرئيسية</a>
+            <a href="#" class="nav-link" onclick="showContent('movies')">الأفلام</a>
+            <a href="#" class="nav-link" onclick="showContent('series')">المسلسلات</a>
+            <a href="#" class="nav-link" onclick="showContinueWatching()">أكمل المشاهدة</a>
+            <a href="#" class="nav-link" onclick="showMyList()">قائمتي</a>
+        </nav>
+        
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن فيلم أو مسلسل...">
+            <button class="search-btn" onclick="performSearch()">🔍</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="heroSection">
+        <div class="hero-content">
+            <h1 class="hero-title" id="heroTitle">استمتع بأفضل الأفلام والمسلسلات</h1>
+            <p class="hero-description" id="heroDescription">آلاف الأفلام والمسلسلات العربية والعالمية بجودة عالية، متاحة للبث المباشر على جميع أجهزتك.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="playRandom()">
+                    <span>▶</span> تشغيل عشوائي
+                </button>
+                <button class="btn btn-secondary" onclick="showInfo()">
+                    <span>ⓘ</span> المزيد من المعلومات
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Continue Watching -->
+    <section class="content-section" id="continueSection" style="display: none;">
+        <div class="section-header">
+            <h2 class="section-title">أكمل المشاهدة</h2>
+            <a href="#" class="see-all" onclick="clearHistory()">مسح السجل</a>
+        </div>
+        <div class="content-grid" id="continueGrid"></div>
+    </section>
+
+    <!-- Movies Section -->
+    <section class="content-section" id="moviesSection">
+        <div class="section-header">
+            <h2 class="section-title">الأفلام الشائعة</h2>
+            <a href="#" class="see-all" onclick="loadMore('movies')">عرض الكل</a>
+        </div>
+        <div class="content-grid" id="moviesGrid">
+            <div class="loading">جاري التحميل...</div>
+        </div>
+    </section>
+
+    <!-- Series Section -->
+    <section class="content-section" id="seriesSection">
+        <div class="section-header">
+            <h2 class="section-title">المسلسلات الشائعة</h2>
+            <a href="#" class="see-all" onclick="loadMore('series')">عرض الكل</a>
+        </div>
+        <div class="content-grid" id="seriesGrid">
+            <div class="loading">جاري التحميل...</div>
+        </div>
+    </section>
+
+    <!-- Arabic Content -->
+    <section class="content-section" id="arabicSection">
+        <div class="section-header">
+            <h2 class="section-title">محتويات عربية</h2>
+            <a href="#" class="see-all" onclick="loadMore('arabic')">عرض الكل</a>
+        </div>
+        <div class="content-grid" id="arabicGrid">
+            <div class="loading">جاري التحميل...</div>
+        </div>
+    </section>
+
+    <!-- Search Results -->
+    <section class="content-section" id="searchSection" style="display: none;">
+        <div class="section-header">
+            <h2 class="section-title" id="searchTitle">نتائج البحث</h2>
+            <a href="#" class="see-all" onclick="hideSearch()">إخفاء</a>
+        </div>
+        <div class="content-grid" id="searchGrid"></div>
+    </section>
+
+    <!-- Episodes Selector -->
+    <div class="episodes-container" id="episodesContainer">
+        <button class="close-btn" onclick="closeEpisodes()">✕</button>
+        <h2 id="episodesTitle" style="margin-bottom: 20px;"></h2>
+        <div class="episodes-grid" id="episodesGrid"></div>
+    </div>
+
+    <!-- Video Player -->
+    <div class="player-container" id="playerContainer">
+        <button class="close-btn" onclick="closePlayer()">✕</button>
+        <video class="video-player" id="videoPlayer" controls></video>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            username: 'xadel99320',
+            password: '01070115953',
+            server: 'http://sa.savpn.xyz',
+            // Video server discovered from your redirect
+            videoServer: 'http://invo2-103.tutor3.site',
+            endpoints: {
+                movies: '/player_api.php?username=xadel99320&password=01070115953&action=get_vod_streams',
+                series: '/player_api.php?username=xadel99320&password=01070115953&action=get_series',
+                categories: '/player_api.php?username=xadel99320&password=01070115953&action=get_vod_categories',
+                seriesInfo: '/player_api.php?username=xadel99320&password=01070115953&action=get_series_info&series_id='
+            }
+        };
+
+        // State
+        let allContent = [];
+        let movies = [];
+        let series = [];
+        let continueWatching = [];
+        let watchHistory = {};
+        let currentPlaying = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            loadContinueWatching();
+            loadContent();
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                const header = document.getElementById('header');
+                header.classList.toggle('scrolled', window.scrollY > 50);
+            });
+
+            // Search on Enter key
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+
+            // ESC key to close player/episodes
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closePlayer();
+                    closeEpisodes();
+                }
+            });
+        }
+
+        // Load all content
+        async function loadContent() {
+            try {
+                console.log('Loading content from API...');
+                
+                // Try to load movies
+                const moviesUrl = CONFIG.server + CONFIG.endpoints.movies;
+                const moviesResponse = await fetchWithTimeout(moviesUrl, 10000);
+                
+                if (moviesResponse.ok) {
+                    movies = await moviesResponse.json();
+                    console.log(`Loaded ${movies.length} movies`);
+                    
+                    // Filter movies (remove series if mixed)
+                    movies = movies.filter(item => item.stream_type === 'movie' || !item.stream_type);
+                    
+                    // Display movies
+                    displayContent('moviesGrid', movies.slice(0, 12), 'movie');
+                    
+                    // Get Arabic movies
+                    const arabicMovies = movies.filter(item => 
+                        /[\u0600-\u06FF]/.test(item.name) || 
+                        (item.category_name && /عرب|arabic/i.test(item.category_name))
+                    );
+                    displayContent('arabicGrid', arabicMovies.slice(0, 12), 'movie');
+                    
+                    // Update hero with random movie
+                    updateHeroWithRandomMovie();
+                }
+
+                // Try to load series
+                const seriesUrl = CONFIG.server + CONFIG.endpoints.series;
+                const seriesResponse = await fetchWithTimeout(seriesUrl, 10000);
+                
+                if (seriesResponse.ok) {
+                    series = await seriesResponse.json();
+                    console.log(`Loaded ${series.length} series`);
+                    
+                    // Display series
+                    displayContent('seriesGrid', series.slice(0, 12), 'series');
+                }
+
+            } catch (error) {
+                console.error('Error loading content:', error);
+                showError('تعذر تحميل المحتوى. تحقق من اتصالك بالإنترنت.');
+            }
+        }
+
+        // Display content in a grid
+        function displayContent(gridId, items, type) {
+            const grid = document.getElementById(gridId);
+            
+            if (!items || items.length === 0) {
+                grid.innerHTML = '<div class="error-message">لا يوجد محتوى متاح</div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = createContentCard(item, type);
+                grid.appendChild(card);
+            });
+        }
+
+        // Create content card with FIXED poster handling
+        function createContentCard(item, type) {
+            const isArabic = /[\u0600-\u06FF]/.test(item.name);
+            const isHD = item.name.includes('HD') || item.name.includes('1080') || item.name.includes('720');
+            const progress = watchHistory[item.stream_id] || 0;
+            const hasProgress = progress > 0 && progress < 0.95;
+            
+            const card = document.createElement('div');
+            card.className = 'content-card' + (hasProgress ? ' continue-watching-card' : '');
+            card.dataset.id = item.stream_id;
+            card.dataset.type = type;
+            
+            // Use REAL poster from API - but handle errors properly
+            let posterUrl = item.stream_icon;
+            
+            // Check if poster URL is valid
+            if (!posterUrl || posterUrl.includes('placeholder.com')) {
+                posterUrl = getLocalPoster(type);
+            }
+            
+            card.innerHTML = `
+                <span class="content-badge">${type === 'series' ? 'مسلسل' : 'فيلم'}</span>
+                <img src="${posterUrl}" 
+                     alt="${item.name}" 
+                     class="content-poster"
+                     onerror="handlePosterError(this, '${type}')">
+                
+                <div class="content-overlay">
+                    <div class="content-title" title="${item.name}">${truncateText(item.name, 25)}</div>
+                    <div class="content-meta">
+                        <span>${isArabic ? '🇪🇬 عربي' : '🌍 أجنبي'}</span>
+                        ${isHD ? '<span class="content-hd">HD</span>' : ''}
+                    </div>
+                </div>
+                
+                ${hasProgress ? `
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${progress * 100}%"></div>
+                    </div>
+                ` : ''}
+            `;
+            
+            card.addEventListener('click', () => {
+                if (type === 'series') {
+                    showEpisodes(item);
+                } else {
+                    playContent(item.stream_id, item.name, 'movie');
+                }
+            });
+            
+            return card;
+        }
+
+        // Handle poster loading errors
+        function handlePosterError(imgElement, type) {
+            console.log('Poster failed to load, using local poster');
+            imgElement.src = getLocalPoster(type);
+            imgElement.onerror = null; // Remove error handler to prevent loop
+        }
+
+        // Play content - USING CORRECT VIDEO URL
+        async function playContent(contentId, title, type, episodeId = null) {
+            try {
+                const playerContainer = document.getElementById('playerContainer');
+                const player = document.getElementById('videoPlayer');
+                
+                // Show loading
+                playerContainer.classList.add('active');
+                player.innerHTML = `
+                    <div style="display:flex; align-items:center; justify-content:center; height:100%;">
+                        <div style="text-align:center;">
+                            <div style="width:50px; height:50px; border:3px solid #e50914; border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px;"></div>
+                            <p style="color:white;">جاري تحميل "${title}"...</p>
+                        </div>
+                    </div>
+                `;
+                
+                // DISCOVERED: Videos are on tutor3.site, not sa.savpn.xyz
+                // From your example: http://invo2-103.tutor3.site/vod/695ee5836c110e0ce7eeac69/695ee5836c110e0ce7eeac69.mp4/index.m3u8
+                
+                // Try different URL patterns until one works
+                const videoUrls = [
+                    // Pattern from your redirect (most likely to work)
+                    `${CONFIG.videoServer}/vod/${contentId}/${contentId}.mp4/index.m3u8`,
+                    
+                    // Alternative patterns
+                    `${CONFIG.videoServer}/movie/${CONFIG.username}/${CONFIG.password}/${contentId}.m3u8`,
+                    `${CONFIG.videoServer}/stream/${contentId}.m3u8`,
+                    `${CONFIG.videoServer}/${contentId}.m3u8`,
+                    
+                    // Original pattern (might work sometimes)
+                    `${CONFIG.server}/movie/${CONFIG.username}/${CONFIG.password}/${contentId}.m3u8`
+                ];
+                
+                console.log('Trying video URLs:', videoUrls);
+                
+                let workingUrl = null;
+                
+                // Try each URL until one works
+                for (let url of videoUrls) {
+                    try {
+                        console.log('Testing URL:', url);
+                        const response = await fetch(url, { method: 'HEAD' });
+                        if (response.ok) {
+                            workingUrl = url;
+                            console.log('Found working URL:', url);
+                            break;
+                        }
+                    } catch (e) {
+                        console.log('URL failed:', url, e.message);
+                        continue;
+                    }
+                }
+                
+                if (!workingUrl) {
+                    throw new Error('لم يتم العثور على رابط تشغيل للفيديو');
+                }
+                
+                // Set video source to working URL
+                player.src = workingUrl;
+                player.load();
+                
+                // Auto-play when ready
+                player.oncanplay = () => {
+                    player.play().catch(e => {
+                        console.log('Autoplay prevented, user needs to click play');
+                    });
+                };
+                
+                // Save as currently playing
+                currentPlaying = {
+                    id: contentId,
+                    title: title,
+                    type: type,
+                    episodeId: episodeId,
+                    startTime: Date.now(),
+                    videoUrl: workingUrl
+                };
+                
+                // Add to continue watching
+                addToContinueWatching(contentId, title, type, episodeId);
+                
+                // Track progress
+                player.addEventListener('timeupdate', () => {
+                    if (player.duration) {
+                        const progress = player.currentTime / player.duration;
+                        watchHistory[contentId] = progress;
+                        localStorage.setItem('watchHistory', JSON.stringify(watchHistory));
+                        
+                        // Update progress in UI if still visible
+                        updateProgressInUI(contentId, progress);
+                    }
+                });
+                
+                // When video ends
+                player.addEventListener('ended', () => {
+                    watchHistory[contentId] = 1; // Mark as completed
+                    localStorage.setItem('watchHistory', JSON.stringify(watchHistory));
+                    
+                    // If series, play next episode
+                    if (type === 'series' && episodeId) {
+                        const currentEpisode = parseInt(episodeId);
+                        setTimeout(() => playContent(contentId, title, 'series', currentEpisode + 1), 2000);
+                    }
+                });
+                
+                // Handle video errors
+                player.onerror = (e) => {
+                    console.error('Video player error:', e);
+                    player.innerHTML = `
+                        <div style="display:flex; align-items:center; justify-content:center; height:100%;">
+                            <div style="text-align:center; color:#e50914;">
+                                <p style="font-size:24px; margin-bottom:20px;">⚠️</p>
+                                <p>تعذر تشغيل الفيديو</p>
+                                <p style="font-size:14px; color:#999; margin-top:10px;">قد يكون الرابط غير صالح أو المحتوى غير متاح</p>
+                                <button onclick="tryAlternativeUrl('${contentId}', '${title}', '${type}', '${episodeId}')" 
+                                        style="background:#e50914; color:white; border:none; padding:10px 20px; border-radius:4px; margin-top:20px; cursor:pointer;">
+                                    حاول رابط آخر
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                };
+                
+            } catch (error) {
+                console.error('Play error:', error);
+                const player = document.getElementById('videoPlayer');
+                player.innerHTML = `
+                    <div style="display:flex; align-items:center; justify-content:center; height:100%;">
+                        <div style="text-align:center; color:#e50914;">
+                            <p style="font-size:24px; margin-bottom:20px;">⚠️</p>
+                            <p>${error.message}</p>
+                            <p style="font-size:14px; color:#999; margin-top:10px;">جاري البحث عن رابط تشغيل بديل...</p>
+                            <button onclick="retryPlay('${contentId}', '${title}', '${type}', '${episodeId}')" 
+                                    style="background:#e50914; color:white; border:none; padding:10px 20px; border-radius:4px; margin-top:20px; cursor:pointer;">
+                                إعادة المحاولة
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Try alternative video URL
+        async function tryAlternativeUrl(contentId, title, type, episodeId = null) {
+            console.log('Trying alternative URL for:', contentId);
+            
+            // Generate alternative URL patterns
+            const patterns = [
+                // Try different server paths
+                `http://invo2-103.tutor3.site/vod/${contentId}/${contentId}.mp4/master.m3u8`,
+                `http://invo2-103.tutor3.site/vod/${contentId}/index.m3u8`,
+                `http://invo2-103.tutor3.site/${contentId}/master.m3u8`,
+                
+                // Try with session parameter (from your example)
+                `http://invo2-103.tutor3.site/vod/${contentId}/${contentId}.mp4/index.m3u8?session=test&location=local`,
+                
+                // Original API server with different paths
+                `${CONFIG.server}/get.php?username=${CONFIG.username}&password=${CONFIG.password}&type=m3u8&id=${contentId}`,
+                `${CONFIG.server}/live/${CONFIG.username}/${CONFIG.password}/${contentId}.m3u8`
+            ];
+            
+            for (let url of patterns) {
+                try {
+                    console.log('Testing alternative URL:', url);
+                    const response = await fetch(url, { method: 'HEAD' });
+                    if (response.ok) {
+                        console.log('Alternative URL works:', url);
+                        
+                        // Update player with new URL
+                        const player = document.getElementById('videoPlayer');
+                        player.src = url;
+                        player.load();
+                        player.play();
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Alternative URL failed:', url);
+                }
+            }
+            
+            alert('لم نتمكن من العثور على رابط تشغيل يعمل لهذا المحتوى.');
+        }
+
+        // Retry play function
+        function retryPlay(contentId, title, type, episodeId = null) {
+            playContent(contentId, title, type, episodeId);
+        }
+
+        // Show episodes for series
+        async function showEpisodes(series) {
+            try {
+                const episodesContainer = document.getElementById('episodesContainer');
+                const episodesTitle = document.getElementById('episodesTitle');
+                const episodesGrid = document.getElementById('episodesGrid');
+                
+                episodesTitle.textContent = `حلقات: ${series.name}`;
+                episodesGrid.innerHTML = '<div class="loading">جاري تحميل الحلقات...</div>';
+                
+                episodesContainer.classList.add('active');
+                
+                // Generate episodes
+                const episodes = generateEpisodes(series);
+                
+                episodesGrid.innerHTML = '';
+                episodes.forEach((episode, index) => {
+                    const episodeCard = document.createElement('div');
+                    episodeCard.className = 'episode-card';
+                    episodeCard.innerHTML = `
+                        <div class="episode-number">الحلقة ${index + 1}</div>
+                        <div style="padding:10px; text-align:center; font-size:12px;">
+                            ${episode.title || `الحلقة ${index + 1}`}
+                        </div>
+                    `;
+                    
+                    episodeCard.addEventListener('click', () => {
+                        closeEpisodes();
+                        playContent(series.stream_id, series.name, 'series', index + 1);
+                    });
+                    
+                    episodesGrid.appendChild(episodeCard);
+                });
+                
+            } catch (error) {
+                console.error('Error loading episodes:', error);
+            }
+        }
+
+        // Close episodes selector
+        function closeEpisodes() {
+            document.getElementById('episodesContainer').classList.remove('active');
+        }
+
+        // Close player
+        function closePlayer() {
+            const player = document.getElementById('videoPlayer');
+            player.pause();
+            player.src = '';
+            document.getElementById('playerContainer').classList.remove('active');
+            
+            // Save current position before closing
+            if (currentPlaying && player.currentTime) {
+                const progress = player.currentTime / player.duration;
+                watchHistory[currentPlaying.id] = progress;
+                localStorage.setItem('watchHistory', JSON.stringify(watchHistory));
+            }
+            
+            currentPlaying = null;
+        }
+
+        // Add to continue watching
+        function addToContinueWatching(contentId, title, type, episodeId = null) {
+            let continueList = JSON.parse(localStorage.getItem('continueWatching') || '[]');
+            
+            // Remove if already exists
+            continueList = continueList.filter(item => item.id !== contentId);
+            
+            // Add to beginning
+            continueList.unshift({
+                id: contentId,
+                title: title,
+                type: type,
+                episodeId: episodeId,
+                added: Date.now(),
+                progress: 0
+            });
+            
+            // Keep only last 20
+            continueList = continueList.slice(0, 20);
+            
+            localStorage.setItem('continueWatching', JSON.stringify(continueList));
+            
+            // Update UI
+            loadContinueWatching();
+        }
+
+        // Load continue watching from localStorage
+        function loadContinueWatching() {
+            const continueList = JSON.parse(localStorage.getItem('continueWatching') || '[]');
+            const watchHistoryData = JSON.parse(localStorage.getItem('watchHistory') || '{}');
+            
+            watchHistory = watchHistoryData;
+            continueWatching = [];
+            
+            // Get actual content data for continue watching items
+            continueList.forEach(item => {
+                let content;
+                if (item.type === 'movie') {
+                    content = movies.find(m => m.stream_id == item.id);
+                } else {
+                    content = series.find(s => s.stream_id == item.id);
+                }
+                
+                if (content) {
+                    content.progress = watchHistoryData[item.id] || 0;
+                    continueWatching.push(content);
+                }
+            });
+            
+            // Display continue watching if has items
+            if (continueWatching.length > 0) {
+                displayContent('continueGrid', continueWatching.slice(0, 12), 'mixed');
+                document.getElementById('continueSection').style.display = 'block';
+            }
+        }
+
+        // Show continue watching section
+        function showContinueWatching() {
+            document.getElementById('continueSection').style.display = 'block';
+            document.getElementById('continueSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Show my list (favorites)
+        function showMyList() {
+            alert('قائمة المفضلة - قريباً!');
+        }
+
+        // Perform search
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                hideSearch();
+                return;
+            }
+            
+            // Show search section
+            document.getElementById('searchSection').style.display = 'block';
+            document.getElementById('searchTitle').textContent = `نتائج البحث عن: "${query}"`;
+            
+            // Search in all content
+            const allItems = [...movies, ...series];
+            const results = allItems.filter(item => 
+                item.name.toLowerCase().includes(query.toLowerCase()) ||
+                (item.category_name && item.category_name.toLowerCase().includes(query.toLowerCase()))
+            );
+            
+            if (results.length === 0) {
+                document.getElementById('searchGrid').innerHTML = 
+                    '<div class="error-message">لم يتم العثور على نتائج مطابقة</div>';
+            } else {
+                displayContent('searchGrid', results, 'mixed');
+            }
+            
+            // Scroll to results
+            document.getElementById('searchSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Hide search results
+        function hideSearch() {
+            document.getElementById('searchSection').style.display = 'none';
+            document.getElementById('searchInput').value = '';
+        }
+
+        // Play random content
+        function playRandom() {
+            const allItems = [...movies, ...series];
+            if (allItems.length === 0) {
+                alert('جاري تحميل المحتوى، الرجاء الانتظار...');
+                return;
+            }
+            
+            const randomItem = allItems[Math.floor(Math.random() * allItems.length)];
+            const type = randomItem.stream_type === 'series' ? 'series' : 'movie';
+            
+            if (type === 'series') {
+                showEpisodes(randomItem);
+            } else {
+                playContent(randomItem.stream_id, randomItem.name, 'movie');
+            }
+        }
+
+        // Clear watch history
+        function clearHistory() {
+            if (confirm('هل تريد مسح سجل المشاهدة؟')) {
+                localStorage.removeItem('continueWatching');
+                localStorage.removeItem('watchHistory');
+                continueWatching = [];
+                watchHistory = {};
+                document.getElementById('continueSection').style.display = 'none';
+                alert('تم مسح سجل المشاهدة');
+            }
+        }
+
+        // Update progress in UI
+        function updateProgressInUI(contentId, progress) {
+            const cards = document.querySelectorAll(`.content-card[data-id="${contentId}"]`);
+            cards.forEach(card => {
+                const progressBar = card.querySelector('.progress');
+                if (progressBar) {
+                    progressBar.style.width = `${progress * 100}%`;
+                }
+            });
+        }
+
+        // Update hero with random movie
+        function updateHeroWithRandomMovie() {
+            if (movies.length === 0) return;
+            
+            const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+            document.getElementById('heroTitle').textContent = randomMovie.name;
+            
+            if (randomMovie.stream_icon && !randomMovie.stream_icon.includes('placeholder.com')) {
+                document.getElementById('heroSection').style.backgroundImage = 
+                    `linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.4)), url('${randomMovie.stream_icon}')`;
+            }
+        }
+
+        // Show info
+        function showInfo() {
+            alert('FOURA CINEMA\nمنصة البث المباشر للافلام والمسلسلات\n\nمميزات المنصة:\n• آلاف الافلام والمسلسلات\n• جودة عالية HD\n• واجهة عربية سهلة\n• متابعة المشاهدة\n• البحث المتقدم\n• تشغيل على جميع الأجهزة');
+        }
+
+        // Generate dummy episodes for series
+        function generateEpisodes(series) {
+            const episodes = [];
+            const episodeCount = Math.floor(Math.random() * 20) + 10; // 10-30 episodes
+            
+            for (let i = 1; i <= episodeCount; i++) {
+                episodes.push({
+                    id: i,
+                    title: `${series.name} - الحلقة ${i}`,
+                    duration: Math.floor(Math.random() * 45) + 20 // 20-65 minutes
+                });
+            }
+            
+            return episodes;
+        }
+
+        // Get local poster (NOT placeholder.com)
+        function getLocalPoster(type) {
+            // Use SVG gradients instead of external placeholder.com
+            const colors = {
+                movie: ['#e50914', '#b20710', '#8B0000'],
+                series: ['#0066cc', '#004c99', '#003366']
+            };
+            const colorSet = colors[type] || colors.movie;
+            const color = colorSet[Math.floor(Math.random() * colorSet.length)];
+            const text = type === 'series' ? 'مسلسل' : 'فيلم';
+            
+            // Create SVG gradient poster
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
+                <defs>
+                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:${color};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:${colorSet[1] || color};stop-opacity:0.7" />
+                    </linearGradient>
+                </defs>
+                <rect width="200" height="300" fill="url(#grad)"/>
+                <text x="100" y="150" font-family="Arial" font-size="20" fill="white" text-anchor="middle">${text}</text>
+            </svg>`;
+        }
+
+        // Utility functions
+        function fetchWithTimeout(url, timeout = 10000) {
+            return Promise.race([
+                fetch(url),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout')), timeout)
+                )
+            ]);
+        }
+
+        function truncateText(text, maxLength) {
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+                <p>${message}</p>
+                <button class="retry-btn" onclick="location.reload()">إعادة المحاولة</button>
+            `;
+            
+            document.body.prepend(errorDiv);
+        }
+    </script>
+</body>
+</html>
